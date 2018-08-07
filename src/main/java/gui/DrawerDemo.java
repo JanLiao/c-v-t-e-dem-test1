@@ -1,17 +1,19 @@
 package gui;
 
+import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
+
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXDrawer.DrawerDirection;
 import com.jfoenix.controls.JFXDrawersStack;
+
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
-import static javafx.scene.input.MouseEvent.MOUSE_PRESSED;
 
 public class DrawerDemo extends Application {
 
@@ -22,7 +24,8 @@ public class DrawerDemo extends Application {
 
     @Override
     public void start(Stage stage) {
-        FlowPane content = new FlowPane();
+    	HBox content = new HBox();
+        //FlowPane content = new FlowPane();
         JFXButton leftButton = new JFXButton(LEFT);
         JFXButton topButton = new JFXButton(TOP);
         JFXButton rightButton = new JFXButton(RIGHT);

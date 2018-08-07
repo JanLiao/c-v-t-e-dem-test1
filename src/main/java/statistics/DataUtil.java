@@ -7,6 +7,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import statisticsSecond.CircleData;
+
 /**
  * @author: jan
  * @date: 2018年6月20日 上午10:41:34
@@ -391,6 +393,87 @@ public class DataUtil {
 		line.setWidth(Double.parseDouble(obj.getString("width")));
 		System.out.println("sole line = " + line);
 		return line;
+	}
+
+	public static statistics.CircleData getAvgCircleNew(List<statistics.CircleData> circleList) {
+		statistics.CircleData circle = new statistics.CircleData();
+		int size = circleList.size();
+
+		double centerX = 0;
+		double centerY = 0;
+		double height = 0;
+		double left = 0;
+		double opacity = 0;
+		double radius = 0;
+		double scaleX = 0;
+		double scaleY = 0;
+		double top = 0;
+		double width = 0;
+		double strokeWidth = 0;
+		double rotateAngle = 0;
+		for (statistics.CircleData data : circleList) {
+			centerX += data.getCenterX();
+			centerY += data.getCenterY();
+			height += data.getHeight();
+			left += data.getLeft();
+			opacity += data.getOpacity();
+			radius += data.getRadius();
+			scaleX += data.getScaleX();
+			scaleY += data.getScaleY();
+			strokeWidth += data.getStrokeWidth();
+			top += data.getTop();
+			width += data.getWidth();
+			rotateAngle += data.getRotateAngle();
+		}
+		circle.setCenterX(centerX / size);
+		circle.setCenterY(centerY / size);
+		circle.setHeight(height / size);
+		//circle.setLeft(left / size);
+		circle.setOpacity(opacity / size);
+		circle.setRadius(radius / size);
+		circle.setScaleX(scaleX / size);
+		circle.setScaleY(scaleY / size);
+		circle.setStrokeWidth(strokeWidth / size);
+		//circle.setTop(top / size);
+		circle.setWidth(width / size);
+		circle.setRotateAngle(rotateAngle/size);
+		
+		String data = getLeftTopAngle(circle);
+		circle.setLeft(Double.parseDouble(data.split(",")[0]));
+		circle.setTop(Double.parseDouble(data.split(",")[1]));
+		circle.setAngle(Double.parseDouble(data.split(",")[2]));
+
+		if (circleList.size() != 0) {
+			circle.setStroke(circleList.get(0).getStroke());
+		}
+		System.out.println("avg circle = " + circle);
+		return circle;
+	}
+
+	public static String getLeftTopAngle(statistics.CircleData circle) {
+		double angle1 = circle.getRotateAngle();
+		double cx = circle.getCenterX();
+		double cy = circle.getCenterY();
+		double a = circle.getRadius()*circle.getScaleX();
+		double b = circle.getRadius()*circle.getScaleY();
+		double angle2 = Math.atan((a/b))*180/Math.PI;
+		double px = 0;
+		double py = 0;
+		double angle = 0;
+		if(angle1 > 0) {  // 验证通过
+			double sin = Math.sin(Math.toRadians(angle1 - angle2));
+			double cos = Math.cos(Math.toRadians(angle1 - angle2));
+			px = cx - Math.sqrt((a*a + b*b)) * cos;
+			py = cy - Math.sqrt((a*a + b*b)) * sin;
+			angle = (360 - (90 - angle1));
+		}else {  // 验证通过
+			double sin = Math.sin(Math.toRadians(-angle1 + angle2));
+			double cos = Math.cos(Math.toRadians(-angle1 + angle2));
+			px = cx - Math.sqrt((a*a + b*b)) * cos;
+			py = cy + Math.sqrt((a*a + b*b)) * sin;
+			angle = (90 + (180 + angle1));
+		}
+		return "" + px + "," + py + "," + angle;
 	}
 
 }

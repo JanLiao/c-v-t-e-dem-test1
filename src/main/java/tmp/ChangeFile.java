@@ -100,18 +100,89 @@ public class ChangeFile {
 		//exportExcelNew("E:/第二批处理Excel_validate", list);
 		
 		// readExcel and check
-		List<String[]> list1 = POIUtil.readExcel(new File("E:/第二批处理Excel_validate/validate.xlsx"));
-		List<String[]> list2 = POIUtil.readExcel(new File("E:/第二批处理Excel_validate/validate1.xlsx"));
-		for(int i = 0; i < list1.size(); i++) {
-			if(!list1.get(i)[0].equals(list2.get(i)[0])) {
-				System.out.println(list1.get(i)[0] + "=" + list2.get(i)[0]);
+//		List<String[]> list1 = POIUtil.readExcel(new File("E:/第二批处理Excel_validate/validate.xlsx"));
+//		List<String[]> list2 = POIUtil.readExcel(new File("E:/第二批处理Excel_validate/validate1.xlsx"));
+//		for(int i = 0; i < list1.size(); i++) {
+//			if(!list1.get(i)[0].equals(list2.get(i)[0])) {
+//				System.out.println(list1.get(i)[0] + "=" + list2.get(i)[0]);
+//			}
+//			if(!(list1.get(i)[1].equals(list2.get(i)[1]))) {
+//				System.out.println(list1.get(i)[1] + "=" + list2.get(i)[1]);
+//			}
+//		}
+		
+		List<String[]> list1 = POIUtil.readExcel(new File("E:/第二批融合图片/Fovea_location2.xlsx"));
+		List<String[]> list2 = POIUtil.readExcel(new File("E:/第二批处理Excel_validate/validateMessage.xlsx"));
+		List<Data> list = new ArrayList<Data>();
+		int num = 0;
+		for(String[] s : list2) {
+			Data data = new Data();
+			data.setId(num);
+			data.setImgName(s[1] + ".jpg");
+			if(("G").equals(s[3])) {
+				data.setLabel(1);
+			}else {
+				data.setLabel(0);
 			}
-			if(!(list1.get(i)[1].equals(list2.get(i)[1]))) {
-				System.out.println(list1.get(i)[1] + "=" + list2.get(i)[1]);
+			double x = getFoveaX(s[2], list1);
+			double y = getFoveaY(s[2], list1);
+			data.setX(x);
+			data.setY(y);
+			data.setOldName(s[2]);
+			list.add(data);
+			num++;
+			copyFile(s[1], s[2], list1, s[3]);
+		}
+		
+		// 保存到Excel
+		String title[] = { "ID", "ImgName", "Label", "Fovea_X", "Fovea_Y", "Old_Name" };
+		String path = "E:/第二批融合图片";
+		String fileName = "Fovea_location";
+		String fileType = "xlsx";
+		WriteExcel.writerSecondPic(path, fileName, fileType, list, title);
+	}
+	
+	public static void copyFile(String vname, String name, List<String[]> list1, String flag) throws IOException {
+		String illustrationpath = "E:\\第二批融合图片\\Disc_Cup_Fovea_Illustration-all";
+		String maskpath = "E:\\第二批融合图片\\Disc_Cup_Masks-gray";
+		String d1path = "E:\\第二批融合图片\\Disc_Cup_Fovea_Illustration";
+		String d2path = "E:\\第二批融合图片\\Disc_Cup_Masks";
+		for(String[] s : list1) {
+			if(name.equals(s[1])) {
+				File srcFile1 = new File(illustrationpath + "/" + name);
+				File destFile1 = new File(d1path + "/" + vname + ".jpg");
+				FileUtils.copyFile(srcFile1, destFile1);
+				
+				File srcFile2 = new File(maskpath + "/" + name.split("[.]")[0] + ".bmp");
+				File destFile2 = new File(d2path + "/" + flag + "/" + vname + ".bmp");
+				FileUtils.copyFile(srcFile2, destFile2);
+				break;
 			}
 		}
 	}
 	
+	private static double getFoveaX(String name, List<String[]> list1) {
+		double x = 0;
+		for(String[] s : list1) {
+			if(name.equals(s[1])) {
+				x = Double.parseDouble(s[2]);
+				break;
+			}
+		}
+		return x;
+	}
+	
+	private static double getFoveaY(String name, List<String[]> list1) {
+		double y = 0;
+		for(String[] s : list1) {
+			if(name.equals(s[1])) {
+				y = Double.parseDouble(s[3]);
+				break;
+			}
+		}
+		return y;
+	}
+
 	private static void exportExcelNew(String path, List<String[]> list) throws IOException {
 		// 保存到Excel
 		String title[] = { "ImgName", "Label" };
